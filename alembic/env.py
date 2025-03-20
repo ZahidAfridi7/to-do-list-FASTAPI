@@ -2,9 +2,22 @@ import asyncio
 from logging.config import fileConfig
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy import pool
-from alembic import context
-from app.db.session import DATABASE_URL  # Import your database URL
-from app.db.models.base import Base  # Import your Base model
+from alembic import context  
+import os
+from dotenv import load_dotenv
+from app.db.models.base import Base  
+
+# Metadata for Alembic autogeneration
+target_metadata = Base.metadata
+
+# Load environment variables from .env
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set. Check your .env file.")
+
 
 # Alembic Config object
 config = context.config
@@ -13,8 +26,6 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Metadata for 'autogenerate' support
-target_metadata = Base.metadata
 
 # Create an Async Engine
 engine = create_async_engine(DATABASE_URL, poolclass=pool.NullPool)
