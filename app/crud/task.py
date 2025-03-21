@@ -43,3 +43,32 @@ async def update_task_crud(db: AsyncSession, task_id: int, task_update: TaskUpda
     await db.refresh(task)
     
     return task
+
+
+async def complete_task_crud(db:AsyncSession, task_id:int):
+    result = await db.execute(select(Task).where(Task.id==task_id))
+    task = result.scalar()
+    
+    if not task:
+        return None
+    
+    task.status = True
+    
+    db.add(task)
+    await db.commit()
+    await db.refresh(task)
+    return task
+
+
+async def delete_task_crud(db:AsyncSession,task_id:int):
+    result = await db.execute(select(Task).where(Task.id==task_id))
+    task = result.scalar()
+    
+    if not task:
+        return None
+    
+    await db.delete(task)
+    await db.commit()
+    return task
+
+    
